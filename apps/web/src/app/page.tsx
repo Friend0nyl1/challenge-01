@@ -3,7 +3,7 @@ import { caller } from "@/lib/trpc/server";
 import { ProductsTable } from "./_components/table";
 
 export default async function Home() {
-	const { products } = await caller.getAllProducts({ limit: 50, offset: 1 });
+	const { products } = await caller.getAllProducts({ limit: 50 , cursor: 1, direction: 'backward' });
 	const { stats } = await caller.getLatestProductStats();
 
 	return (
