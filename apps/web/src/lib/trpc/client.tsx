@@ -7,9 +7,10 @@ import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { createTRPCContext } from "@trpc/tanstack-react-query";
 import { useState } from "react";
 import { makeQueryClient } from "./query-client";
+import { createTRPCReact } from '@trpc/react-query';
 
-export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
-
+export const { TRPCProvider, useTRPC  } = createTRPCContext<AppRouter>();
+export const trpc = createTRPCReact<AppRouter>()
 let browserQueryClient: QueryClient | undefined;
 
 function getQueryClient() {
@@ -47,7 +48,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-				{props.children}
+				<trpc.Provider client={trpcClient} queryClient={queryClient}>{props.children}</trpc.Provider>
 			</TRPCProvider>
 		</QueryClientProvider>
 	);

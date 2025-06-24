@@ -7,7 +7,7 @@ import { createContext } from "./lib/context";
 import { appRouter } from "./routers/index";
 
 const app = new Hono();
-
+app.use("*", cors());
 app.use(logger());
 app.use(
 	"/*",

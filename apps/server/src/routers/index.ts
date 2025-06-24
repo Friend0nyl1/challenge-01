@@ -2,7 +2,7 @@ import z from "zod";
 import { db } from "../db";
 import { productStats, products } from "../db/schema/products";
 import { publicProcedure, router } from "../lib/trpc";
-import { asc, desc, gt, lt } from "drizzle-orm";
+import { asc, desc, gt, gte, lt, lte } from "drizzle-orm";
 
 export const appRouter = router({
 	healthCheck: publicProcedure.query(() => {
@@ -11,44 +11,31 @@ export const appRouter = router({
 	getAllProducts: publicProcedure
 		.input(
 			z.object({
-				limit: z.number().min(1).max(100).optional().default(50),
-				cursor: z.number().nullish(),
-				direction: z.enum(['forward', 'backward']).optional().default('forward'),
+				limit: z.number().min(1).max(500).optional().default(50),
+				cursor: z.number().nullish().optional(),
 			}),
 		)
 		.query(async (opts) => {
-			const { limit, cursor, direction } = opts.input;
+			const { limit, cursor } = opts.input;
 			const allProducts = await db
 				.select()
 				.from(products)
-				.where(direction === 'forward' ? gt(products.id, cursor || 0) : lt(products.id, cursor || 0))
-				.orderBy(direction === 'forward' ? asc(products.id) : desc(products.id))
+				.where(gt(products.id, cursor || 0))
+				.orderBy( asc(products.id))
 				.limit(limit);
 
 			let nextCursor: typeof cursor | undefined = undefined;
-			let previousCursor: typeof cursor | undefined = undefined;
 
-			if (allProducts.length > limit) {
-				if (direction === 'forward') {
-					const nextItem = allProducts.pop();
-					nextCursor = nextItem?.id as number
-				} else {
-					const previousItem = allProducts.shift()
-					previousCursor = previousItem?.id as number
-					nextCursor = allProducts[allProducts.length - 1].id as number
-				}
+			if(allProducts.length > 0){
+				nextCursor = allProducts[allProducts.length - 1].id as number
 			}
 
-			if(direction === 'backward'){
-				allProducts.reverse()
-			}
 
-			await new Promise((resolve) => setTimeout(resolve, 3000));
+			// await new Promise((resolve) => setTimeout(resolve, 3000));
 
 			return {
 				products: allProducts,
-				nextCursor,
-				previousCursor
+				nextCursor
 			};
 		}),
 	getLatestProductStats: publicProcedure.query(async () => {
