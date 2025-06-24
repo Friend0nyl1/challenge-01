@@ -31,10 +31,10 @@ export const appRouter = router({
 			if (allProducts.length > limit) {
 				if (direction === 'forward') {
 					const nextItem = allProducts.pop();
-					nextCursor = nextItem!.id as number
+					nextCursor = nextItem?.id as number
 				} else {
 					const previousItem = allProducts.shift()
-					previousCursor = previousItem!.id as number
+					previousCursor = previousItem?.id as number
 					nextCursor = allProducts[allProducts.length - 1].id as number
 				}
 			}
@@ -42,8 +42,6 @@ export const appRouter = router({
 			if(direction === 'backward'){
 				allProducts.reverse()
 			}
-
-
 
 			await new Promise((resolve) => setTimeout(resolve, 3000));
 

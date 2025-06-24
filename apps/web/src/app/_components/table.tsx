@@ -1,3 +1,4 @@
+'use client';
 import {
 	Table,
 	TableBody,
@@ -7,9 +8,34 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { Product } from "@server/db/schema/products";
+import { use, useEffect, useRef } from "react";
 
 export function ProductsTable({ products }: { products: Product[] }) {
+	const loadMoreRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (entries[0].isIntersecting) {
+					console.log("load more");
+				}
+			},
+			{ threshold: 1.0 }
+		);
+
+
+		if (loadMoreRef.current) {
+			observer.observe(loadMoreRef.current);
+		}
+
+		return () => {
+			if (loadMoreRef.current) {
+				observer.unobserve(loadMoreRef.current);
+			}
+		};
+	}, [])
 	return (
+		<>
 		<Table>
 			<TableHeader>
 				<TableRow>
@@ -138,5 +164,7 @@ export function ProductsTable({ products }: { products: Product[] }) {
 				))}
 			</TableBody>
 		</Table>
+		<div ref={loadMoreRef}></div>
+		</>
 	);
 }
