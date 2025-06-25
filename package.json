@@ -17,6 +17,7 @@
 		"db:migrate": "turbo -F server db:migrate"
 	},
 	"dependencies": {
+		"@tanstack/react-virtual": "^3.13.11",
 		"@trpc/react-query": "^11.4.2"
 	},
 	"devDependencies": {
