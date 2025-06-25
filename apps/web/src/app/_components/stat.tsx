@@ -1,7 +1,13 @@
+'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTRPC } from "@/lib/trpc/client";
 import type { ProductStats as ProductStatsType } from "@server/db/schema/products";
+import { useSuspenseQuery } from '@tanstack/react-query'
 
-export function ProductStats({ stats }: { stats: ProductStatsType }) {
+export function ProductStats() {
+	const trpc = useTRPC();
+	const { data } =  useSuspenseQuery(trpc.getLatestProductStats.queryOptions());
+	const stats = { ...data.stats , created_at: new Date(data.stats.created_at) };
 	return (
 		<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 			<Card>
