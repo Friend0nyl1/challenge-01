@@ -116,11 +116,6 @@ These are not required, but implementing them would be a great way to impress us
 -   **Virtualize the Table** Done ✔️
 -   **Real-time Filtering** Done ✔️
 
-
-
-
-
-
 ## Available Scripts
 
 - `bun dev`: Start all applications in development mode

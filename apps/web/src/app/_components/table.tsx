@@ -97,7 +97,7 @@ export function ProductsTable({ search }: { search: string | null }) {
 						</TableBody>
 					</Table>
 				}
-				{<Table >
+				{!isPrepareVirtualItems && <Table >
 					{<TableHeader >
 						<TableRow >
 							<TableHead style={{ width: '50px' }}>ID</TableHead>
