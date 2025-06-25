@@ -109,6 +109,18 @@ These are not required, but implementing them would be a great way to impress us
 
 -   **Real-time Filtering:** Add a search input field above the table. As the user types, filter the product list in real-time. This will require creating a new tRPC procedure that accepts a search term and also supports pagination. Debouncing the input is highly encouraged.
 
+## Task Process 
+-   **Implement Cursor-Based Pagination** Done ✔️
+-   **Improve Initial Page Load Experience** Done ✔️
+-   **Implement Infinite Scrolling** Done ✔️
+-   **Virtualize the Table** Done ✔️
+-   **Real-time Filtering** Done ✔️
+
+
+
+
+
+
 ## Available Scripts
 
 - `bun dev`: Start all applications in development mode
