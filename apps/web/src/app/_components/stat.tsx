@@ -1,7 +1,6 @@
 'use client'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTRPC } from "@/lib/trpc/client";
-import type { ProductStats as ProductStatsType } from "@server/db/schema/products";
 import { useSuspenseQuery } from '@tanstack/react-query'
 
 export function ProductStats() {

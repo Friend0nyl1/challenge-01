@@ -7,16 +7,17 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
-import { trpc, useTRPC } from "@/lib/trpc/client";
+import { trpc } from "@/lib/trpc/client";
 import { useEffect, useRef } from "react";
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
-export function ProductsTable() {
+
+export function ProductsTable({ search }: { search: string | null }) {
 	const loadMoreRef = useRef<HTMLDivElement>(null);
+
 	const limit = 50
 	const [{ pages }, allProductsQuery] = trpc.getAllProducts.useSuspenseInfiniteQuery(
-		{limit},
+		{ limit, search },
 		{
 			getNextPageParam: (res) => {
 				if (res.products.length < limit) {
@@ -24,12 +25,12 @@ export function ProductsTable() {
 				}
 				return res.nextCursor
 			},
-			
+
 		},
 	);
-	const { data, isFetchingNextPage, fetchNextPage, hasNextPage ,isPending ,isFetching  } = allProductsQuery;
+	const { isFetchingNextPage, fetchNextPage, hasNextPage } = allProductsQuery;
 
-	const products = data?.pages.flatMap((page) => page.products) || [];
+	const products = pages?.flatMap((page) => page.products) || [];
 
 
 
@@ -63,38 +64,42 @@ export function ProductsTable() {
 	]);
 
 
+	const isPrepareVirtualItems = virtualItems && virtualItems.length <= 0 && products.length > 0
+	const isShowData = products.length > 0 && products && virtualItems.length > 0
+
+
 	return (
 		<>
-			{<div className="rounded-md border min-w-full h-[80vh] overflow-y-scroll" ref={loadMoreRef}>
-				{virtualItems && virtualItems.length <= 0 &&
-                <Table>
-                    <TableHeader>
-<TableRow>
-							<TableHead style={{ width: '50px' }}>ID</TableHead>
-							<TableHead style={{ width: '100px' }}>SKU</TableHead>
-							<TableHead style={{ width: '150px' }}>Name</TableHead>
-							<TableHead style={{ width: '200px' }}>Description</TableHead>
-							<TableHead style={{ width: '100px' }}>Brand</TableHead>
-							<TableHead style={{ width: '100px' }}>Category</TableHead>
-						</TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {[...Array(17)].map((_, i) => (
-                            <TableRow key={i} style={{ height: '40px' }}>
-                                <TableCell><Skeleton className="h-4 w-[40px]" /></TableCell>
-                                <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
-                                <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
-                                <TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
-                                <TableCell><Skeleton className="h-4 w-[60px]" /></TableCell>
-                                <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                }
-				{products.length > 0 && products &&<Table>
-					<TableHeader >
-						<TableRow>
+			{<div className="rounded-md border min-w-full h-[80vh] overflow-y-auto" ref={loadMoreRef}>
+				{isPrepareVirtualItems &&
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead style={{ width: '50px' }}>ID</TableHead>
+								<TableHead style={{ width: '100px' }}>SKU</TableHead>
+								<TableHead style={{ width: '150px' }}>Name</TableHead>
+								<TableHead style={{ width: '200px' }}>Description</TableHead>
+								<TableHead style={{ width: '100px' }}>Brand</TableHead>
+								<TableHead style={{ width: '100px' }}>Category</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{[...Array(17)].map((_, i) => (
+								<TableRow key={i} style={{ height: '40px' }}>
+									<TableCell><Skeleton className="h-4 w-[40px]" /></TableCell>
+									<TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+									<TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+									<TableCell><Skeleton className="h-4 w-[180px]" /></TableCell>
+									<TableCell><Skeleton className="h-4 w-[60px]" /></TableCell>
+									<TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				}
+				{<Table >
+					{<TableHeader >
+						<TableRow >
 							<TableHead style={{ width: '50px' }}>ID</TableHead>
 							<TableHead style={{ width: '100px' }}>SKU</TableHead>
 							<TableHead style={{ width: '150px' }}>Name</TableHead>
@@ -144,9 +149,9 @@ export function ProductsTable() {
 							<TableHead style={{ width: '150px' }}>Last Restocked At</TableHead>
 							<TableHead style={{ width: '150px' }}>Discontinued At</TableHead>
 						</TableRow>
-					</TableHeader>
+					</TableHeader>}
 
-					<TableBody>
+					{isShowData && <TableBody>
 						<tr style={{ height: virtualItems[0]?.start || 0, display: 'table-row' }} />
 						{virtualItems.map((virtualRow) => {
 							const product = products[virtualRow.index];
@@ -227,7 +232,18 @@ export function ProductsTable() {
 								</TableRow>
 							)
 						})}
-					</TableBody>
+
+						{isFetchingNextPage && [...Array(17)].map((_, i) => (
+							<TableRow key={i} style={{ height: '40px' }}>
+								{[...Array(51)].map((_, i) => (
+									<TableCell key={i}>
+										<Skeleton className="h-4 w-full" />
+									</TableCell>
+								))}
+
+							</TableRow>
+						))}
+					</TableBody>}
 				</Table>}
 			</div>}
 		</>

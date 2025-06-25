@@ -1,15 +1,20 @@
-
+'use client';
 import { ProductStats } from "@/app/_components/stat";
 import { ProductsTable } from "./_components/table";
-import { Suspense } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Circle, LoaderCircle } from "lucide-react";
+import { Suspense, useState } from "react";
+import {  LoaderCircle } from "lucide-react";
 import { LoadingProductStats } from "@/components/loadingProductStats";
+import { SearchInput } from "@/components/searchInput";
+import { useDebounce } from "@/hook/debounce-hook";
 
 
-export default async function Home() {
-
+export default  function Home() {
+	const [ search , setSearch ] = useState<string | null>(null)
+	const debouncedSearchTerm = useDebounce(search, 500);
+	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+		console.log(e.target.value)
+		setSearch(e.target.value)
+	}
 
 
 	return (
@@ -18,12 +23,13 @@ export default async function Home() {
 				<Suspense fallback={<LoadingProductStats/>}>
 					<ProductStats />
 				</Suspense>
+				<SearchInput handleSearch={handleSearch} />
 				<Suspense fallback={<div className="absolute inset-0 flex items-center justify-center z-50                   
                     ">
-					<LoaderCircle size={40} className="animate-spi " />
+					<LoaderCircle size={80} className="animate-spin" />
 				</div>
 				}>
-					<ProductsTable />
+					<ProductsTable search={debouncedSearchTerm} />
 				</Suspense>
 			</div>
 		</div>
